@@ -39,7 +39,7 @@
 #include <linux/i2c/twl.h>
 #include <linux/wait.h>
 #include <linux/spi/spi.h>
-#include <asm-generic/uaccess.h>
+#include <asm/uaccess.h>
 #include <linux/irq.h>
 
 #include <asm-generic/siginfo.h>
@@ -48,7 +48,9 @@
 #include <linux/jiffies.h>
 #include <linux/wakelock.h>
 #include <linux/pinctrl/consumer.h>
+#include <linux/gpio.h>
 #include <plat/gpio-cfg.h>
+#include "../pinctrl/core.h"
 
 /* Major number of device ID.
  * A device ID consists of two parts: a major number, identifying the class of
@@ -62,16 +64,17 @@
 
 #define DRDY_ACTIVE_STATUS      0
 #define BITS_PER_WORD           16
-#define DRDY_IRQ_FLAG	(IRQF_TRIGGER_FALLING)
+#define DRDY_IRQ_FLAG	(IRQF_TRIGGER_FALLING | IRQF_ONESHOT)
+
+#define VENDOR		"SYNAPTICS"
+#define CHIP_ID		"RAPTOR"
 
 /* Timeout value for polling DRDY signal assertion */
 #define DRDY_TIMEOUT_MS      40
 
 #ifdef ENABLE_SENSORS_FPRINT_SECURE
 #define FEATURE_SPI_WAKELOCK
-#endif
-
-#define PINCONTROL
+#endif /* CONFIG_SEC_FACTORY */
 
 /*
  * Definitions of structures which are used by IOCTL commands
@@ -186,5 +189,6 @@ and retrieve data from it simultaneously */
 /* get sensor orienation from the SPI driver*/
 #define VFSSPI_IOCTL_GET_SENSOR_ORIENT	\
 	_IOR(VFSSPI_IOCTL_MAGIC, 18, unsigned int)
+#define VFSSPI_IOCTL_SET_SENSOR_TYPE	\
+	_IOW(VFSSPI_IOCTL_MAGIC, 20, unsigned int)
 #endif /* VFS61XX_H_ */
-
